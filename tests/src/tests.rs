@@ -19,6 +19,8 @@ fn test_poc050_deploy() {
     assert_eq!(t.name(), token_cfg::NAME);
     assert_eq!(t.symbol(), token_cfg::SYMBOL);
     assert_eq!(t.decimals(), token_cfg::DECIMALS);
+    assert_eq!(t.currency(), token_cfg::CURRENCY);
+    assert_eq!(t.owner(), t.futjin);
     assert_eq!(t.balance_of(t.futjin), token_cfg::total_supply());
     assert_eq!(t.balance_of(t.bro), 0.into());
     assert_eq!(t.allowance(t.futjin, t.futjin), 0.into());
@@ -92,4 +94,38 @@ fn test_poc050_transfer_from_too_much() {
 }
 
 // transfer_from_too_much! ]
+// incrase_allowance [
+
+#[test]
+fn test_poc050_incrace_allowance() {
+    let allowance = 500.into();
+    let mut t = Token::deployed();
+    t.increase_allowance(t.bro, allowance, Sender(t.futjin));
+    let allowance_contract = t.allowance(t.futjin, t.bro);
+    assert_eq!(allowance_contract, allowance);
+}
+
+// incrase_allowance ]
+// decrease_allowance [
+
+#[test]
+#[should_panic]
+fn test_poc050_decrase_allowance_fail() {
+    let allowance = 500.into();
+    let mut t = Token::deployed();
+    t.decrease_allowance(t.bro, allowance, Sender(t.futjin));
+    assert_eq!(t.allowance(t.futjin, t.bro), allowance);
+}
+
+#[test]
+fn test_poc050_decrase_allowance() {
+    let allowance = 500.into();
+    let amount = 5.into();
+    let mut t = Token::deployed();
+    t.increase_allowance(t.bro, allowance, Sender(t.futjin));
+    t.decrease_allowance(t.bro, amount, Sender(t.futjin));
+    assert_eq!(t.allowance(t.futjin, t.bro), allowance - amount);
+}
+
+// decrease_allowance ]
 // tests_poc050_{} ]

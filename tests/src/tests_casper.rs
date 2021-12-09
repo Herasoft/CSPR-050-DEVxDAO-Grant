@@ -18,6 +18,8 @@ fn test_casper_safemath_overflow_min() {
 fn test_casper_safemath_overflow_max() {
     let mut amount: U256 = U256::max_value();
     amount += 1.into();
+    panic!("called `Option::unwrap()` on a `None` value")
+
 }
 
 #[test]

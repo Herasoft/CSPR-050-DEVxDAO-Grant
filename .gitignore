@@ -2,3 +2,5 @@ target
 Cargo.lock
 tests/wasm/contract.wasm
 .DS_Store
+wasm
+test1.sh

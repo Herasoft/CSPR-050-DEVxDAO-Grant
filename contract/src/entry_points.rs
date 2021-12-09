@@ -96,7 +96,7 @@ pub fn default() -> EntryPoints {
     ));
 
     entry_points.add_entry_point(endpoint(
-        "burnFrom",
+        "burn_from",
         vec![
             Parameter::new("account", AccountHash::cl_type()),
             Parameter::new("value", CLType::U256),
@@ -108,7 +108,7 @@ pub fn default() -> EntryPoints {
         "increase_allowance",
         vec![
             Parameter::new("spender", AccountHash::cl_type()),
-            Parameter::new("addedValue", CLType::U256),
+            Parameter::new("added_value", CLType::U256),
         ],
         CLType::Unit
     ));
@@ -117,7 +117,7 @@ pub fn default() -> EntryPoints {
         "decrease_allowance",
         vec![
             Parameter::new("spender", AccountHash::cl_type()),
-            Parameter::new("subtractedValue", CLType::U256),
+            Parameter::new("subtracted_value", CLType::U256),
         ],
         CLType::Unit
     ));

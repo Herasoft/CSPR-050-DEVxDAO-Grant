@@ -1,6 +1,10 @@
 //! POC050 purpose is collateral backed stable coin
 //! Notes: The code uses the rustdoc documentation system for the code and livecomment for the architecture
-  
+//! 
+//! Version history
+//! 1.02 RC3 Review Candidate 3 12/09/2021
+//! 1.01 RC2 Review Candidate 2 11/14/2021 416b31a5f6956cef5f567641eefca87341d87e63 - deprecated
+//! 1.00 RC1 Review Candidate 1 08/21/2021 0863ffb934d852a2af4e0b279fd3a05cd8b09de2 - deprecated 
 
 // 0 [
 
@@ -37,11 +41,16 @@ use types::{
     bytesrepr::{FromBytes, ToBytes},
     contracts::{EntryPoint, EntryPointAccess, EntryPointType, EntryPoints, NamedKeys},
     runtime_args, CLType, CLTyped, CLValue, Group, Parameter, RuntimeArgs, URef, U256,
+    ApiError
 };
 
+//#[no_mangle]
+//pub extern "C" fn call() {
+//    runtime::revert(ApiError::PermissionDenied)
+//}
 // use casper ]
 // api [
-// GET name, symbol, decimals, total_supply [
+// GET name, symbol, decimals, total_supply, currency, owner [
 
 #[no_mangle]
 pub extern "C" fn name() {
@@ -67,37 +76,19 @@ pub extern "C" fn total_supply() {
     ret(val)
 }
 
-// GET name, symbol, decimals, total_supply ]
-// GET currency, masterMinter [
-
-#[no_mangle]
-pub extern "C" fn masterMinter() {
-    let val: U256 = get_key("masterMinter");
-    ret(val)
-}
-
 #[no_mangle]
 pub extern "C" fn currency() {
     let val: String = get_key("currency");
     ret(val)
 }
 
-// GET currency, masterMinter ]
-// GET pauser, paused [
-
 #[no_mangle]
-pub extern "C" fn pauser() {
-    let val: U256 = get_key("pauser");
+pub extern "C" fn owner() {
+    let val: U256 = get_key("owner");
     ret(val)
 }
 
-#[no_mangle]
-pub extern "C" fn paused() {
-    let val: bool = get_key("paused");
-    ret(val)
-}
-
-// GET pauser, paused ]
+// GET name, symbol, decimals, total_supply, currency, owner ]
 // balance_of (account) [
 
 #[no_mangle]
@@ -150,16 +141,13 @@ pub extern "C" fn transfer_from() {
 }
 
 // transfer_from (owner, recipient, amount) ]
-
-
-
 // increase_allowance (address spender, uint256 addedValue) [
 
 #[no_mangle]
 pub extern "C" fn increase_allowance() {
     let spender: AccountHash = runtime::get_named_arg("spender");
-    let addedValue: U256 = runtime::get_named_arg("addedValue");
-    _increase_allowance(spender, addedValue);
+    let added_value: U256 = runtime::get_named_arg("added_value");
+    _increase_allowance(spender, added_value);
 }
 
 // increase_allowance (address spender, uint256 addedValue) ]
@@ -168,8 +156,8 @@ pub extern "C" fn increase_allowance() {
 #[no_mangle]
 pub extern "C" fn decrease_allowance() {
     let spender: AccountHash = runtime::get_named_arg("spender");
-    let subtractedValue: U256 = runtime::get_named_arg("subtractedValue");
-    _decrease_allowance(spender, subtractedValue);
+    let subtracted_value: U256 = runtime::get_named_arg("subtracted_value");
+    _decrease_allowance(spender, subtracted_value);
 }
 
 // decrease_allowance (address spender, uint256 subtractedValue) ]
@@ -236,6 +224,10 @@ pub extern "C" fn call() {
         storage::new_uref(token_total_supply).into(),
     );
     named_keys.insert("currency".to_string(), storage::new_uref(currency).into());
+    named_keys.insert(
+        "owner".to_string(),
+        storage::new_uref(runtime::get_caller()).into(),
+    );
 
     // props: name, symbol, decimals, total_supply, currency ]
     // props: map<balances_{caller}> = total_supply [
@@ -347,17 +339,26 @@ fn _decrease_allowance(spender: AccountHash, subtracted_value: U256) {
 // @param account The account that will receive the created tokens.
 // @param value The amount that will be created.
 
+#[macro_export]
+macro_rules! only_owner {
+    () => {
+        let owner = get_key::<AccountHash>("owner");
+        if runtime::get_caller() != owner {
+            runtime::revert(ApiError::PermissionDenied)
+        }
+    };
+}
+
 fn _mint(account: AccountHash, amount: U256) {
+    only_owner!();
+
     let recipient_key = balance_key(&account);
-    let minter_allowed_key = minter_allowed_key(&runtime::get_caller());
 
     let new_total_supply: U256 = get_key::<U256>("total_supply") + amount;
     let new_recipient_balance: U256 = (get_key::<U256>(&recipient_key) + amount);
-    let new_minter_allowed_amount: U256 = (get_key::<U256>(&minter_allowed_key) - amount);
 
     set_key("total_supply", new_total_supply);
     set_key(&recipient_key, new_recipient_balance);
-    set_key(&minter_allowed_key, new_minter_allowed_amount);
 }
 
 // _mint (account, value) ]
@@ -370,6 +371,13 @@ fn _mint(account: AccountHash, amount: U256) {
 // @param value The amount that will be burnt.
 
 fn _burn(account: AccountHash, amount: U256) {
+    only_owner!();
+
+    _burn_internal(account, amount)
+}
+
+fn _burn_internal(account: AccountHash, amount: U256) {
+
     let recipient_key = balance_key(&account);
 
     let new_total_supply: U256 = get_key::<U256>("total_supply") - amount;
@@ -399,7 +407,7 @@ fn _burn_from(account: AccountHash, value: U256) {
 
     // allowance (account, sender) minus (value) ]
 
-    _burn(account, value);
+    _burn_internal(account, value);
 }
 
 // _burn_from (account, value) ]

@@ -130,8 +130,12 @@ impl Token {
         self.query_contract("decimals").unwrap()
     }
 
-    pub fn currency(&self) -> u8 {
+    pub fn currency(&self) -> String {
         self.query_contract("currency").unwrap()
+    }
+
+    pub fn owner(&self) -> AccountHash {
+        self.query_contract("owner").unwrap()
     }
 
     // name, symbol, decimals, currency ]
@@ -208,7 +212,7 @@ impl Token {
             "increase_allowance",
             runtime_args! {
                 "spender" => spender,
-                "addedValue" => added_value
+                "added_value" => added_value
             },
         );
         true
