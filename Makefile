@@ -24,3 +24,8 @@ lint: clippy
 clean:
 	cargo clean
 	rm -rf tests/wasm/contract.wasm
+
+test-clean:
+	make clean
+	rm Cargo.lock
+	make test

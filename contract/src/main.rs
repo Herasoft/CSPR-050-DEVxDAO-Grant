@@ -181,7 +181,7 @@ pub extern "C" fn burn() {
 }
 
 // burn (account, value) ]
-// burn_from (account, tokenId) [
+// burn_from (account, value) [
 
 #[no_mangle]
 pub extern "C" fn burn_from() {
