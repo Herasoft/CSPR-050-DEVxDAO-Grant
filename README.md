@@ -95,7 +95,7 @@ fn owner(): U256
 
 #### Contract logic functions
 
-get balance_of (account)
+##### balance_of (account)
 
 Gets the balance of the specified address.
 - account The address to query the balance of.
@@ -105,7 +105,7 @@ Return An U256 representing the amount owned by the passed address.
 fn balance_of(account: AccountHash): U256
 ```
 
-get allowance (owner, spender)
+##### allowance (owner, spender)
 
 Function to check the amount of tokens that an owner allowed to a spender.
 - owner address The address which owns the funds.
@@ -116,7 +116,7 @@ Return A U256 specifying the amount of tokens still available for the spender.
 fn allowance(owner: AccountHash, spender: AccountHash): U256
 ```
 
-approve (spender, amount)
+##### approve (spender, amount)
 
 Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
 Beware that changing an allowance with this method brings the risk that someone may use both the old
@@ -130,7 +130,7 @@ https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
 fm approve(spender: AccountHash, amount: U256)
 ```
 
-transfer (recipient, amount)
+##### transfer (recipient, amount)
 
 Transfer token for a specified address
 - recipient The address to transfer to.
@@ -140,7 +140,7 @@ Transfer token for a specified address
 fn transfer(recipient: AccountHash, amount: U256)
 ```
 
-transfer_from (owner, recipient, amount) 
+##### transfer_from (owner, recipient, amount) 
 
 Transfer tokens from one address to another
 - owner The address which you want to send tokens from
@@ -151,7 +151,7 @@ Transfer tokens from one address to another
 fn transfer_from(owner: AccountHash, recipient: AccountHash, amount: U256) 
 ```
 
-increase_allowance (spender, added_value)
+##### increase_allowance (spender, added_value)
 
 Increase the amount of tokens that an owner allowed to a spender.
 approve should be called when allowed_[_spender] == 0. 
@@ -163,7 +163,7 @@ To increment allowed value is better to use this function to avoid 2 calls (and 
 fn increase_allowance(spender: AccountHash, added_value: U256)
 ```
 
-decrease_allowance (spender, subtracted_value)
+##### decrease_allowance (spender, subtracted_value)
 
 Decrease the amount of tokens that an owner allowed to a spender.
 approve should be called when allowed_[_spender] == 0. 
@@ -175,7 +175,7 @@ To decrement allowed value is better to use this function to avoid 2 calls (and 
 fn decrease_allowance(spender AccountHash, subtracted_value: U256)
 ```
 
-mint (account, value)
+##### mint (account, value)
 
 Function that mints an amount of the token and assigns it to an account. This encapsulates the modification of balances such that the proper events are emitted.
 - account The account that will receive the created tokens.
@@ -185,7 +185,7 @@ Function that mints an amount of the token and assigns it to an account. This en
 fn mint(accoutn:AccountHash, value: U256)
 ```
 
-burn (account, value)
+##### burn (account, value)
 
 Function that burns an amount of the token of a given account.
 - account The account whose tokens will be burnt.
@@ -195,7 +195,7 @@ Function that burns an amount of the token of a given account.
 fn burn(accoutn:AccountHash, value: U256)
 ```
 
-burn_from (account, value)
+##### burn_from (account, value)
 
 Function that burns an amount of the token of a given account, deducting from the sender's allowance for said account. Uses the internal burn function.
 - account The account whose tokens will be burnt.
