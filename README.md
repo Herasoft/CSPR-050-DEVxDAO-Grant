@@ -127,7 +127,7 @@ https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
 - value The amount of tokens to be spent.
 
 ```rust
-fm approve(spender: AccountHash, amount: U256)
+fn approve(spender: AccountHash, amount: U256)
 ```
 
 ##### transfer (recipient, amount)
